@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import React, { useState } from "react";
 import { MdLockOutline, MdOutlineLockOpen, MdClose } from "react-icons/md";
+import { twMerge as tm } from "tailwind-merge";
 
 interface RowInterface {
   color: Colors;
@@ -89,27 +90,30 @@ interface NumberInterface {
 }
 
 const squareClass = (color: Colors, disabled?: boolean) =>
-  clsx(
-    "w-11 h-11 border-2 rounded grid items-center justify-center font-bold cursor-pointer relative",
-    {
-      "hover:bg-red-100 bg-red-50 text-red-600 border-red-800": color === "red",
-    },
-    {
-      "hover:bg-blue-100 bg-blue-50 text-blue-600 border-blue-800":
-        color === "blue",
-    },
-    {
-      "hover:bg-green-100 bg-green-50 text-green-600 border-green-800":
-        color === "green",
-    },
-    {
-      "hover:bg-yellow-100 bg-yellow-50 text-yellow-600 border-yellow-800":
-        color === "yellow",
-    },
-    {
-      "hover:bg-gray-300 bg-gray-300 text-gray-600 border-gray-800 cursor-auto":
-        disabled,
-    }
+  tm(
+    clsx(
+      "w-11 h-11 border-2 rounded grid items-center justify-center font-bold cursor-pointer relative",
+      {
+        "hover:bg-red-100 bg-red-50 text-red-600 border-red-800":
+          color === "red",
+      },
+      {
+        "hover:bg-blue-100 bg-blue-50 text-blue-600 border-blue-800":
+          color === "blue",
+      },
+      {
+        "hover:bg-green-100 bg-green-50 text-green-600 border-green-800":
+          color === "green",
+      },
+      {
+        "hover:bg-yellow-100 bg-yellow-50 text-yellow-600 border-yellow-800":
+          color === "yellow",
+      },
+      {
+        "hover:bg-gray-300 bg-gray-300 text-gray-600 border-gray-800 cursor-auto":
+          disabled,
+      }
+    )
   );
 
 const Number = (props: NumberInterface) => {
@@ -122,7 +126,10 @@ const Number = (props: NumberInterface) => {
   };
 
   return (
-    <div className={squareClass(props.color, disabled)} onClick={handleOnClick}>
+    <div
+      className={clsx(squareClass(props.color, disabled))}
+      onClick={handleOnClick}
+    >
       {isSelected && (
         <MdClose className="absolute w-9 h-9 shadow-2xl self-center justify-self-center" />
       )}
@@ -137,23 +144,36 @@ const Lock = ({ color }: { color: Colors }) => {
     setIsLocked(!isLocked);
   };
 
+  const LockIcon = isLocked ? MdLockOutline : MdOutlineLockOpen;
+
   return (
     <div
-      className={clsx(squareClass(color), "rounded-full ml-2")}
+      className={clsx(
+        squareClass(color),
+        "rounded-full ml-2",
+        {
+          "!bg-red-700 !text-white": isLocked && color === "red",
+        },
+        {
+          "!bg-blue-700 !text-white": isLocked && color === "blue",
+        },
+        {
+          "!bg-green-700 !text-white": isLocked && color === "green",
+        },
+        {
+          "!bg-yellow-700 !text-white": isLocked && color === "yellow",
+        }
+      )}
       onClick={handleOnClick}
     >
-      {isLocked ? (
-        <MdLockOutline className="w-6 h-6 rotate-[30deg]" />
-      ) : (
-        <MdOutlineLockOpen className="w-6 h-6 rotate-[30deg]" />
-      )}
+      <LockIcon className={clsx("w-6 h-6 rotate-[30deg]")} />
     </div>
   );
 };
 
 const Penalty = () => {
-  const [isSelected, setIsSelected] = useState(false);
-  const disabled = false;
+  const [isSelected, setIsSelected] = useState(true);
+  const disabled = true;
   const handleOnClick = () => {
     if (disabled) return;
     setIsSelected(!isSelected);
@@ -161,9 +181,8 @@ const Penalty = () => {
   return (
     <div
       className={clsx(
-        "w-6 h-6 border-2 rounded grid items-center justify-center font-bold border-gray-400",
-        { "text-gray-900": !disabled },
-        { "text-gray-400": disabled }
+        "w-6 h-6 border rounded grid items-center justify-center font-bold border-gray-800 text-gray-800",
+        { "bg-gray-300": disabled }
       )}
       onClick={handleOnClick}
     >
