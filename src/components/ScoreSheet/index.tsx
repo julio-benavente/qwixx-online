@@ -55,6 +55,18 @@ const EndTurnButton = () => {
   const userIsDone = useAppSelector((state) => state.game.done);
   const dispatch = useAppDispatch();
   const onToggleEndTurn = () => dispatch(toggleEndTurn());
+
+  const endTurn = () => {
+    // Validate there is at least one box selected
+    // if not a penalty or one will be automatically selected
+    // save all penalties
+    // save all boxes selected
+    // clean all penalties selected
+    // clean all boxes selected
+    // clean done button
+    // clean dices
+  };
+
   return (
     <button
       className={tm(
