@@ -51,7 +51,13 @@ interface InitialStateProps {
   isMyTurn: boolean;
   done: boolean;
   dices: Dices;
-  dicesCombinationsPossible: [];
+  dicesPossibleCombinations: {
+    white: number[];
+    red: number[];
+    yellow: number[];
+    green: number[];
+    blue: number[];
+  };
   dicesRolled: boolean;
   boxesSelected: number;
   scoreSheetRows: ScoreSheetRowsType;
@@ -74,7 +80,13 @@ const initialState: InitialStateProps = {
     green: 0,
     blue: 0,
   },
-  dicesCombinationsPossible: [],
+  dicesPossibleCombinations: {
+    white: [],
+    red: [],
+    yellow: [],
+    green: [],
+    blue: [],
+  },
   dicesRolled: false,
   boxesSelected: 0,
   scoreSheetRows: scoreSheet,
@@ -123,13 +135,34 @@ const gameSlice = createSlice({
       state.dicesRolled = true;
 
       // this functionality could be done on the server
-      state.dices = {
+      const dicesSelected = {
         whiteOne: _.random(1, 6),
         whiteTwo: _.random(1, 6),
         red: _.random(1, 6),
         yellow: _.random(1, 6),
         green: _.random(1, 6),
         blue: _.random(1, 6),
+      };
+      state.dices = dicesSelected;
+
+      state.dicesPossibleCombinations = {
+        white: [dicesSelected.whiteOne + dicesSelected.whiteTwo],
+        red: [
+          dicesSelected.red + dicesSelected.whiteOne,
+          dicesSelected.red + dicesSelected.whiteTwo,
+        ],
+        yellow: [
+          dicesSelected.yellow + dicesSelected.whiteOne,
+          dicesSelected.yellow + dicesSelected.whiteTwo,
+        ],
+        green: [
+          dicesSelected.green + dicesSelected.whiteOne,
+          dicesSelected.green + dicesSelected.whiteTwo,
+        ],
+        blue: [
+          dicesSelected.blue + dicesSelected.whiteOne,
+          dicesSelected.blue + dicesSelected.whiteTwo,
+        ],
       };
     },
     setDices: (state, action: PayloadAction<Dices>) => {

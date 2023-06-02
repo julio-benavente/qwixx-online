@@ -42,7 +42,8 @@ interface DiceProps {
 }
 
 const Dice = (props: DiceProps) => {
-  const random = _.times(_.random(24, 28), () => _.random(1, 6, false));
+  // const random = _.times(_.random(24, 28), () => _.random(1, 6, false));
+  const random = _.times(_.random(2, 4), () => _.random(1, 6, false));
   const [diceSelected, setDiceSelected] = useState<number>(1);
   const dispatch = useAppDispatch();
   const dicesRolled = useAppSelector((state) => state.game.dicesRolled);

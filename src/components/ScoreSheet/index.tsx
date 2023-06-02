@@ -175,6 +175,9 @@ const Box = (props: NumberInterface) => {
 
   const dispatch = useAppDispatch();
   const boxesSelected = useAppSelector((state) => state.game.boxesSelected);
+  const dicesPossibleCombinations = useAppSelector(
+    (state) => state.game.dicesPossibleCombinations
+  );
 
   const isSelected = data.selected || data.temporalySelected;
   const isDisabled = data.disabled || data.temporalyDisabled;
@@ -183,6 +186,23 @@ const Box = (props: NumberInterface) => {
   const checkBox = () => {
     if (boxesSelected === 2 && !data.temporalySelected) return;
     if (isDisabled) return;
+
+    const isInAllPossibleCombinations = [
+      ...dicesPossibleCombinations.white,
+      ...dicesPossibleCombinations[data.color],
+    ].includes(data.number);
+
+    if (!isInAllPossibleCombinations) return;
+
+    if (boxesSelected >= 1) {
+      const isInSameColorPossibleCombinations = dicesPossibleCombinations[
+        data.color
+      ].includes(data.number);
+
+      // console.log({ isInSameColorPossibleCombinations });
+
+      if (!isInSameColorPossibleCombinations) return;
+    }
 
     dispatch(toggleCheckBox(elementLocation));
 
