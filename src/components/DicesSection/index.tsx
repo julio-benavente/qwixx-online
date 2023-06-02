@@ -4,6 +4,15 @@ import { MdCircle } from "react-icons/md";
 import _ from "lodash";
 import { useAppDispatch, useAppSelector } from "@/store-hooks";
 import { rollDices } from "@/ent-game";
+import {
+  NumberOneDots,
+  NumberTwoDots,
+  NumberThreeDots,
+  NumberFourDots,
+  NumberFiveDots,
+  NumberSixDots,
+} from "@/components/DicesSection/DicesDots";
+import RollDicesButton from "./RollDicesButton";
 
 type DiceArrayType = { [key: number]: React.JSX.Element };
 
@@ -16,61 +25,20 @@ const DicesSection: React.FC<
       {...props}
     >
       <div className="grid grid-cols-3 grid-rows-2 gap-4">
-        <Dice color="yellow" />
-        <Dice color="green" />
-        <Dice color="blue" />
-        <Dice color="white" />
-        <Dice color="red" />
-        <Dice color="white" />
+        <Dice type="yellow" />
+        <Dice type="green" />
+        <Dice type="blue" />
+        <Dice type="whiteOne" />
+        <Dice type="red" />
+        <Dice type="whiteTwo" />
       </div>
       <RollDicesButton />
     </div>
   );
 };
 
-interface RollDicesButtonProps {}
-const RollDicesButton = (props: RollDicesButtonProps) => {
-  const dicesRolled = useAppSelector((state) => state.game.dicesRolled);
-  const dispatch = useAppDispatch();
-
-  const onRollDices = () => {
-    if (dicesRolled) return;
-
-    dispatch(rollDices());
-  };
-
-  return (
-    <button
-      className="w-20 h-20 relative rounded-full bg-gradient-to-br from-orange-300 to-orange-500 group"
-      onClick={onRollDices}
-    >
-      <div
-        className={clsx(
-          "absolute w-16 h-16 rounded-full bg-red-700/75 top-2/4 left-2/4 -translate-x-1/2 -translate-y-[48%] grid items-center shadow-lg transition",
-          "group-hover:bg-red-900/75 group-hover:-translate-y-[48%]"
-        )}
-      ></div>
-      <div
-        className={clsx(
-          "absolute w-16 h-16 rounded-full  top-2/4 left-2/4 -translate-x-1/2 -translate-y-[52%] grid items-center shadow-lg",
-          "bg-red-600",
-          "group-active:bg-red-700/90"
-        )}
-      >
-        <span
-          className={clsx(
-            "absolute w-16 h-16 rounded-full  top-2/4 left-2/4 -translate-x-1/2 -translate-y-1/2 grid items-center shadow-lg transition",
-            "bg-gradient-to-br from-white/10 to-white-/0"
-          )}
-        ></span>
-        <span className="text-white">Roll</span>
-      </div>
-    </button>
-  );
-};
-
 interface DiceProps {
-  color: Colors;
+  type: DicesType;
 }
 
 const Dice = (props: DiceProps) => {
@@ -78,35 +46,40 @@ const Dice = (props: DiceProps) => {
   const [diceSelected, setDiceSelected] = useState<number>(1);
   const dispatch = useAppDispatch();
   const dicesRolled = useAppSelector((state) => state.game.dicesRolled);
+  const dicesSelected = useAppSelector((state) => state.game.dices);
+  const color =
+    props.type === "whiteOne" || props.type === "whiteTwo"
+      ? "white"
+      : props.type;
 
   const dices: DiceArrayType = {
     1: (
-      <DiceWrapper color={props.color}>
+      <DiceWrapper color={color}>
         <NumberOneDots />
       </DiceWrapper>
     ),
     2: (
-      <DiceWrapper color={props.color}>
+      <DiceWrapper color={color}>
         <NumberTwoDots />
       </DiceWrapper>
     ),
     3: (
-      <DiceWrapper color={props.color}>
+      <DiceWrapper color={color}>
         <NumberThreeDots />
       </DiceWrapper>
     ),
     4: (
-      <DiceWrapper color={props.color}>
+      <DiceWrapper color={color}>
         <NumberFourDots />
       </DiceWrapper>
     ),
     5: (
-      <DiceWrapper color={props.color}>
+      <DiceWrapper color={color}>
         <NumberFiveDots />
       </DiceWrapper>
     ),
     6: (
-      <DiceWrapper color={props.color}>
+      <DiceWrapper color={color}>
         <NumberSixDots />
       </DiceWrapper>
     ),
@@ -118,6 +91,8 @@ const Dice = (props: DiceProps) => {
         setTimeout(() => resolve(setDiceSelected(number)), _.random(140, 200))
       );
     }
+
+    setDiceSelected(dicesSelected[props.type]);
   };
 
   useEffect(() => {
@@ -131,6 +106,7 @@ const Dice = (props: DiceProps) => {
 
 export default DicesSection;
 type Colors = "red" | "blue" | "green" | "yellow" | "white";
+type DicesType = "red" | "blue" | "green" | "yellow" | "whiteOne" | "whiteTwo";
 
 interface DiceInterface {
   children: ReactElement | ReactElement[];
@@ -153,147 +129,5 @@ const DiceWrapper = ({ children, color }: DiceInterface) => {
     >
       {children}
     </div>
-  );
-};
-
-const Circle = () => {
-  return <MdCircle className="w-3 h-3" />;
-};
-
-const NumberOneDots = () => {
-  return (
-    <>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-    </>
-  );
-};
-
-const NumberTwoDots = () => {
-  return (
-    <>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-    </>
-  );
-};
-
-const NumberThreeDots = () => {
-  return (
-    <>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-    </>
-  );
-};
-
-const NumberFourDots = () => {
-  return (
-    <>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-    </>
-  );
-};
-
-const NumberFiveDots = () => {
-  return (
-    <>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-    </>
-  );
-};
-
-const NumberSixDots = () => {
-  return (
-    <>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-      <span>
-        <Circle />
-      </span>
-      <span></span>
-      <span>
-        <Circle />
-      </span>
-    </>
   );
 };

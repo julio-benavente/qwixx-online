@@ -121,6 +121,16 @@ const gameSlice = createSlice({
     },
     rollDices: (state) => {
       state.dicesRolled = true;
+
+      // this functionality could be done on the server
+      state.dices = {
+        whiteOne: _.random(1, 6),
+        whiteTwo: _.random(1, 6),
+        red: _.random(1, 6),
+        yellow: _.random(1, 6),
+        green: _.random(1, 6),
+        blue: _.random(1, 6),
+      };
     },
     setDices: (state, action: PayloadAction<Dices>) => {
       state.dices = {
