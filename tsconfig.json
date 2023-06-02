@@ -14,13 +14,18 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/helpers": ["./src/helpers"],
+      "@/store-hooks": ["./src/store/hooks"],
+      "@/types": ["./src/types"],
+      "@/ent-game": ["./src/store/entities/game"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

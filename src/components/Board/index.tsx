@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PlayersSection from "../PlayersSection";
 import ScoreSheet from "../ScoreSheet";
 import DicesSection from "../DicesSection";
 import clsx from "clsx";
+import { startMyTurn } from "@/store/entities/game";
+import { useAppSelector, useAppDispatch } from "@/store-hooks";
 
 const Board = () => {
+  const state = useAppSelector((state) => state);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(startMyTurn());
+  }, []);
+
   return (
     <div
       className={clsx(

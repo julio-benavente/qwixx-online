@@ -2,50 +2,47 @@ import clsx from "clsx";
 import React, { ReactElement, useEffect, useState } from "react";
 import { MdCircle } from "react-icons/md";
 import _ from "lodash";
+import { useAppDispatch, useAppSelector } from "@/store-hooks";
+import { rollDices } from "@/ent-game";
 
 type DiceArrayType = { [key: number]: React.JSX.Element };
 
 const DicesSection: React.FC<
   React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
 > = ({ className, ...props }) => {
-  const [dicesRolled, setDicesRolled] = useState<boolean>(false);
-
   return (
     <div
       className={clsx("grid grid-flow-col gap-x-8 items-center", className)}
       {...props}
     >
       <div className="grid grid-cols-3 grid-rows-2 gap-4">
-        <Dice color="yellow" dicesRolled={dicesRolled} />
-        <Dice color="green" dicesRolled={dicesRolled} />
-        <Dice color="blue" dicesRolled={dicesRolled} />
-        <Dice color="white" dicesRolled={dicesRolled} />
-        <Dice color="red" dicesRolled={dicesRolled} />
-        <Dice color="white" dicesRolled={dicesRolled} />
+        <Dice color="yellow" />
+        <Dice color="green" />
+        <Dice color="blue" />
+        <Dice color="white" />
+        <Dice color="red" />
+        <Dice color="white" />
       </div>
-      <RollDicesButton
-        dicesRolled={dicesRolled}
-        setDicesRolled={setDicesRolled}
-      />
+      <RollDicesButton />
     </div>
   );
 };
 
-interface RollDicesButtonProps {
-  dicesRolled: boolean;
-  setDicesRolled: React.Dispatch<React.SetStateAction<boolean>>;
-}
+interface RollDicesButtonProps {}
 const RollDicesButton = (props: RollDicesButtonProps) => {
-  const roollDices = () => {
-    if (props.dicesRolled) return;
+  const dicesRolled = useAppSelector((state) => state.game.dicesRolled);
+  const dispatch = useAppDispatch();
 
-    props.setDicesRolled(true);
+  const onRollDices = () => {
+    if (dicesRolled) return;
+
+    dispatch(rollDices());
   };
 
   return (
     <button
       className="w-20 h-20 relative rounded-full bg-gradient-to-br from-orange-300 to-orange-500 group"
-      onClick={roollDices}
+      onClick={onRollDices}
     >
       <div
         className={clsx(
@@ -74,12 +71,13 @@ const RollDicesButton = (props: RollDicesButtonProps) => {
 
 interface DiceProps {
   color: Colors;
-  dicesRolled: boolean;
 }
 
 const Dice = (props: DiceProps) => {
-  const random = _.times(39, () => _.random(1, 6, false));
-  const [diceSelected, setDiceSelected] = useState<number>(_.random(1, 6));
+  const random = _.times(_.random(24, 28), () => _.random(1, 6, false));
+  const [diceSelected, setDiceSelected] = useState<number>(1);
+  const dispatch = useAppDispatch();
+  const dicesRolled = useAppSelector((state) => state.game.dicesRolled);
 
   const dices: DiceArrayType = {
     1: (
@@ -114,19 +112,19 @@ const Dice = (props: DiceProps) => {
     ),
   };
 
-  const loop = async () => {
+  const rollDices = async () => {
     for (let number of random) {
       await new Promise((resolve, reject) =>
-        setTimeout(() => resolve(setDiceSelected(number)), 200)
+        setTimeout(() => resolve(setDiceSelected(number)), _.random(140, 200))
       );
     }
   };
 
   useEffect(() => {
-    if (props.dicesRolled) {
-      loop();
+    if (dicesRolled) {
+      rollDices();
     }
-  }, [props.dicesRolled]);
+  }, [dicesRolled]);
 
   return <>{dices[diceSelected]}</>;
 };
