@@ -175,12 +175,19 @@ const Box = (props: NumberInterface) => {
 
   const dispatch = useAppDispatch();
   const boxesSelected = useAppSelector((state) => state.game.boxesSelected);
+  const scoreSheetPoints = useAppSelector(
+    (state) => state.game.scoreSheetPoints
+  );
   const dicesPossibleCombinations = useAppSelector(
     (state) => state.game.dicesPossibleCombinations
   );
 
   const isSelected = data.selected || data.temporalySelected;
-  const isDisabled = data.disabled || data.temporalyDisabled;
+  const isDisabled =
+    data.disabled ||
+    data.temporalyDisabled ||
+    (data.number === (["red", "yellow"].includes(data.color) ? 12 : 2) &&
+      scoreSheetPoints[data.color] < 5);
   const elementLocation = { color: data.color, name: data.name };
 
   const checkBox = () => {
@@ -188,14 +195,13 @@ const Box = (props: NumberInterface) => {
     if (isDisabled) return;
 
     // logic when box will be unchecked
-    // console.log({ isSelected });
     if (isSelected) {
       dispatch(toggleCheckBox(elementLocation));
       dispatch(decreaseBoxesSelected());
       return;
     }
 
-    // select box
+    // validate combination of whites if first
     const isInAllPossibleCombinations = [
       ...dicesPossibleCombinations.white,
       ...dicesPossibleCombinations[data.color],
@@ -208,13 +214,10 @@ const Box = (props: NumberInterface) => {
         data.color
       ].includes(data.number);
 
-      // console.log({ isInSameColorPossibleCombinations });
-
       if (!isInSameColorPossibleCombinations) return;
     }
 
     dispatch(toggleCheckBox(elementLocation));
-
     dispatch(increaseBoxesSelected());
   };
 
