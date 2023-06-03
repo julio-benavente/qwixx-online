@@ -187,6 +187,15 @@ const Box = (props: NumberInterface) => {
     if (boxesSelected === 2 && !data.temporalySelected) return;
     if (isDisabled) return;
 
+    // logic when box will be unchecked
+    // console.log({ isSelected });
+    if (isSelected) {
+      dispatch(toggleCheckBox(elementLocation));
+      dispatch(decreaseBoxesSelected());
+      return;
+    }
+
+    // select box
     const isInAllPossibleCombinations = [
       ...dicesPossibleCombinations.white,
       ...dicesPossibleCombinations[data.color],
@@ -206,9 +215,7 @@ const Box = (props: NumberInterface) => {
 
     dispatch(toggleCheckBox(elementLocation));
 
-    !isSelected
-      ? dispatch(increaseBoxesSelected())
-      : dispatch(decreaseBoxesSelected());
+    dispatch(increaseBoxesSelected());
   };
 
   const onDoubleClick = () => {
