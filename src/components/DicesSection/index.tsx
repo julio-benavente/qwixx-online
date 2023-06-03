@@ -97,6 +97,12 @@ const Dice = (props: DiceProps) => {
   };
 
   useEffect(() => {
+    if (dicesSelected[props.type] === 0) {
+      setDiceSelected(1);
+    }
+  }, [dicesSelected[props.type]]);
+
+  useEffect(() => {
     if (dicesRolled) {
       rollDices();
     }

@@ -1,11 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import _ from "lodash";
-import { BoxType, ColorsType, PenaltyValuesType } from "@/types";
+import { BoxType, ColorsType, PenaltyType, PenaltyValuesType } from "@/types";
 import { getDicesCombinations } from "@/helpers";
 
-const dicesColor: ColorsType[] = ["red", "yellow", "green", "blue"];
+const colorsType: ColorsType[] = ["red", "yellow", "green", "blue"];
 const numbers = _.range(2, 13);
-const scoreSheet = dicesColor
+const scoreSheet = colorsType
   .map((color: ColorsType) => {
     const array = numbers.map((number) => ({
       name: `${color}-${number}`,
@@ -62,9 +62,7 @@ interface InitialStateProps {
   boxesSelected: number;
   scoreSheetRows: ScoreSheetRowsType;
   scoreSheetPoints: { [key in ColorsType]: number };
-  scoreSheetPenalties: {
-    [key in PenaltyValuesType]: { name: PenaltyValuesType; selected: boolean };
-  };
+  scoreSheetPenalties: PenaltyType[];
   penaltiesSelected: number;
   scoreSheetPenaltyPoints: number;
 }
@@ -96,24 +94,28 @@ const initialState: InitialStateProps = {
     green: 0,
     blue: 0,
   },
-  scoreSheetPenalties: {
-    first: {
+  scoreSheetPenalties: [
+    {
       name: "first",
       selected: false,
+      temporalySelected: false,
     },
-    second: {
+    {
       name: "second",
       selected: false,
+      temporalySelected: false,
     },
-    third: {
+    {
       name: "third",
       selected: false,
+      temporalySelected: false,
     },
-    fourth: {
+    {
       name: "fourth",
       selected: false,
+      temporalySelected: false,
     },
-  },
+  ],
   penaltiesSelected: 0,
   scoreSheetPenaltyPoints: 0,
 };
@@ -131,6 +133,34 @@ const gameSlice = createSlice({
     endMyTurn: (state) => {
       state.isMyTurn = false;
     },
+    endTurn: (state) => {
+      // Validate there is at least one box selected
+      // if not a penalty or one will be automatically selected
+      // save all penalties
+      // save all boxes selected
+      for (let color of colorsType) {
+        state.scoreSheetRows[color] = state.scoreSheetRows[color].map((e) => ({
+          ...e,
+          disabled: e.temporalyDisabled,
+          selected: e.temporalySelected,
+          temporalyDisabled: e.temporalyDisabled,
+          temporalySelected: e.temporalySelected,
+        }));
+      }
+
+      state.scoreSheetPenalties = state.scoreSheetPenalties.map((e) => ({
+        ...e,
+        selected: e.temporalySelected,
+        temporalySelected: e.temporalySelected,
+      }));
+      state.done = initialState.done;
+      state.dices = initialState.dices;
+      state.dicesPossibleCombinations = initialState.dicesPossibleCombinations;
+      state.dicesRolled = initialState.dicesRolled;
+      state.boxesSelected = initialState.boxesSelected;
+      state.penaltiesSelected = initialState.penaltiesSelected;
+    },
+
     rollDices: (state) => {
       state.dicesRolled = true;
 
@@ -231,8 +261,16 @@ const gameSlice = createSlice({
       action: PayloadAction<{ name: PenaltyValuesType }>
     ) => {
       const { name } = action.payload;
-      state.scoreSheetPenalties[name].selected =
-        !state.scoreSheetPenalties[name].selected;
+      const index = state.scoreSheetPenalties.findIndex((e) => e.name === name);
+      const element = state.scoreSheetPenalties[index];
+
+      if (element.temporalySelected) {
+        state.penaltiesSelected -= 1;
+      } else {
+        state.penaltiesSelected += 1;
+      }
+      state.scoreSheetPenalties[index].temporalySelected =
+        !state.scoreSheetPenalties[index].temporalySelected;
     },
     toggleEndTurn: (state) => {
       state.done = !state.done;
@@ -242,6 +280,7 @@ const gameSlice = createSlice({
 
 export const {
   endMyTurn,
+  endTurn,
   reset,
   rollDices,
   setDices,

@@ -8,6 +8,7 @@ import { BoxType, ColorsType, PenaltyType, PenaltyValuesType } from "@/types";
 import {
   decreaseBoxesSelected,
   disableBox,
+  endTurn,
   increaseBoxesSelected,
   toggleCheckBox,
   toggleEndTurn,
@@ -54,17 +55,11 @@ export default ScoreSheet;
 const EndTurnButton = () => {
   const userIsDone = useAppSelector((state) => state.game.done);
   const dispatch = useAppDispatch();
-  const onToggleEndTurn = () => dispatch(toggleEndTurn());
+  // const onToggleEndTurn = () => dispatch(toggleEndTurn());
+  const onToggleEndTurn = () => {
+    dispatch(toggleEndTurn());
 
-  const endTurn = () => {
-    // Validate there is at least one box selected
-    // if not a penalty or one will be automatically selected
-    // save all penalties
-    // save all boxes selected
-    // clean all penalties selected
-    // clean all boxes selected
-    // clean done button
-    // clean dices
+    setTimeout(() => dispatch(endTurn()), 4000);
   };
 
   return (
@@ -128,10 +123,9 @@ const PenaltySection = () => {
     <div className="grid justify-self-end mr-[52px]">
       <p className="text-sm text-right">Penalty (-5)</p>
       <div className={clsx("flex gap-x-1 p-0 justify-end")}>
-        <PenaltyBox data={penalties.first} />
-        <PenaltyBox data={penalties.second} />
-        <PenaltyBox data={penalties.third} />
-        <PenaltyBox data={penalties.fourth} />
+        {penalties.map((e) => (
+          <PenaltyBox data={e} />
+        ))}
       </div>
     </div>
   );
@@ -186,6 +180,7 @@ const Box = (props: NumberInterface) => {
   const isDisabled =
     data.disabled ||
     data.temporalyDisabled ||
+    data.selected ||
     (data.number === (["red", "yellow"].includes(data.color) ? 12 : 2) &&
       scoreSheetPoints[data.color] < 5);
   const elementLocation = { color: data.color, name: data.name };
@@ -193,6 +188,10 @@ const Box = (props: NumberInterface) => {
   const checkBox = () => {
     if (boxesSelected === 2 && !data.temporalySelected) return;
     if (isDisabled) return;
+
+    if (data.selected) {
+      return;
+    }
 
     // logic when box will be unchecked
     if (isSelected) {
@@ -277,12 +276,35 @@ type PenaltyBoxProps = {
 };
 
 const PenaltyBox = (props: PenaltyBoxProps) => {
+  const penaltiesSelected = useAppSelector(
+    (state) => state.game.penaltiesSelected
+  );
   const disabled = props.data.selected;
   const dispacth = useAppDispatch();
 
   const handleOnClick = () => {
+    if (disabled) return;
+
+    if (props.data.temporalySelected) {
+      dispacth(togglePenalty({ name: props.data.name }));
+      return;
+    }
+
+    if (penaltiesSelected > 0) {
+      return;
+    }
+
     dispacth(togglePenalty({ name: props.data.name }));
+
+    //
+
+    // if (boxesSelected === 2 && !data.temporalySelected) return;
+
+    // logic when box will be unchecked
   };
+
+  const isSelected = props.data.selected || props.data.temporalySelected;
+
   return (
     <div
       className={clsx(
@@ -291,7 +313,7 @@ const PenaltyBox = (props: PenaltyBoxProps) => {
       )}
       onClick={handleOnClick}
     >
-      {props.data.selected && <MdClose className="w-4 h-4" />}
+      {isSelected && <MdClose className="w-4 h-4" />}
     </div>
   );
 };

@@ -12,4 +12,8 @@ export type BoxType = {
 
 export type PenaltyValuesType = "first" | "second" | "third" | "fourth";
 
-export type PenaltyType = { name: PenaltyValuesType; selected: boolean };
+export type PenaltyType = {
+  name: PenaltyValuesType;
+  selected: boolean;
+  temporalySelected: boolean;
+};
